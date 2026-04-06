@@ -1,0 +1,31 @@
+export type MovementId = number
+export type VideoId = number
+export type AnnotationId = number
+
+export interface Movement {
+  id: MovementId
+  name: string
+  description?: string
+  createdAt: number
+}
+
+export interface Video {
+  id: VideoId
+  movementId: MovementId
+  sessionId?: number
+  createdAt: number
+}
+
+export interface Annotation {
+  id: AnnotationId
+  videoId: VideoId
+  timestamp: number
+  text: string
+  type: 'note' | 'issue' | 'improvement'
+}
+
+export interface Session {
+  id: number
+  date: number
+  notes?: string
+}
