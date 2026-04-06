@@ -1,5 +1,6 @@
-export async function pickVideoFile(): Promise<FileSystemFileHandle> {
-  const [handle] = await window.showOpenFilePicker({
+export async function pickVideoFiles(): Promise<FileSystemFileHandle[]> {
+  return window.showOpenFilePicker({
+    multiple: true,
     types: [
       {
         description: 'Videos',
@@ -7,8 +8,6 @@ export async function pickVideoFile(): Promise<FileSystemFileHandle> {
       }
     ]
   })
-
-  return handle
 }
 
 export async function getVideoURL(handle: FileSystemFileHandle) {
