@@ -31,6 +31,7 @@ export function VideoPlayer({ handle, createdAt, onDelete }: Props) {
     <div className={styles.card}>
       <div className={styles.meta}>
         <span className={styles.filename}>{handle.name}</span>
+        <div className={styles.group}>
         <span className={styles.date}>{date}</span>
         {confirming ? (
           <div className={styles.confirmDelete}>
@@ -40,7 +41,7 @@ export function VideoPlayer({ handle, createdAt, onDelete }: Props) {
           </div>
         ) : (
           <button className={styles.deleteBtn} onClick={() => setConfirming(true)}>×</button>
-        )}
+        )}</div>
       </div>
       {url ? (
         <video className={styles.video} src={url} controls />
