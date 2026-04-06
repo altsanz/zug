@@ -21,10 +21,19 @@ export interface Annotation {
   type: 'note' | 'issue' | 'improvement'
 }
 
+export interface ChecklistItem {
+  id?: number
+  movementId: number
+  text: string
+  done: boolean
+  createdAt: number
+}
+
 class AppDB extends Dexie {
   movements!: Table<Movement, number>
   videos!: Table<Video, number>
   annotations!: Table<Annotation, number>
+  checklists!: Table<ChecklistItem, number>
 
   constructor() {
     super('BreakTrainerDB')
@@ -33,6 +42,13 @@ class AppDB extends Dexie {
       movements: '++id, name, createdAt',
       videos: '++id, movementId, createdAt',
       annotations: '++id, videoId, timestamp'
+    })
+
+    this.version(2).stores({
+      movements: '++id, name, createdAt',
+      videos: '++id, movementId, createdAt',
+      annotations: '++id, videoId, timestamp',
+      checklists: '++id, movementId, done'
     })
   }
 }

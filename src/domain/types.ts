@@ -29,3 +29,13 @@ export interface Session {
   date: number
   notes?: string
 }
+
+export type ChecklistItemId = number
+
+export interface ChecklistItem {
+  id: ChecklistItemId
+  movementId: MovementId
+  text: string
+  done: boolean
+  createdAt: number
+}

@@ -2,6 +2,9 @@ import { useEffect, useRef, useState } from 'react'
 import { movementsApi } from './movements.api'
 import { videosApi } from '../videos/videos.api'
 import { VideoPlayer } from '../videos/videoPlayer'
+import { VideoAnnotator } from '../videos/VideoAnnotator'
+import { VideoComparison } from '../videos/VideoComparison'
+import { ChecklistPanel } from '../checklists/ChecklistPanel'
 import type { Movement, Video } from '../../db/db'
 import styles from './movementsPage.module.css'
 
@@ -13,6 +16,8 @@ export function MovementsPage() {
   const [adding, setAdding] = useState(false)
   const [newName, setNewName] = useState('')
   const [pendingDeleteId, setPendingDeleteId] = useState<number | null>(null)
+  const [openVideoId, setOpenVideoId] = useState<number | null>(null)
+  const [comparing, setComparing] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
   async function loadMovements() {
@@ -43,6 +48,8 @@ export function MovementsPage() {
     } else {
       setVideos([])
     }
+    setOpenVideoId(null)
+    setComparing(false)
   }, [selected])
 
   useEffect(() => {
@@ -73,11 +80,13 @@ export function MovementsPage() {
 
   async function deleteVideo(id: number) {
     await videosApi.remove(id)
+    setOpenVideoId(null)
     if (selected != null) await loadVideos(selected)
     await loadMovements()
   }
 
   const selectedMovement = movements.find((m) => m.id === selected)
+  const openVideo = videos.find((v) => v.id === openVideoId)
 
   return (
     <div className={styles.layout}>
@@ -158,38 +167,61 @@ export function MovementsPage() {
           <div className={styles.emptyPanel}>
             <p>Select a movement</p>
           </div>
+        ) : openVideo != null ? (
+          <VideoAnnotator
+            video={openVideo}
+            onBack={() => setOpenVideoId(null)}
+            onDelete={() => deleteVideo(openVideo.id!)}
+          />
+        ) : comparing ? (
+          <VideoComparison
+            videos={videos}
+            onBack={() => setComparing(false)}
+          />
         ) : (
           <>
             <div className={styles.panelHeader}>
               <span className={styles.panelTitle}>{selectedMovement?.name}</span>
-              <button
-                className={styles.addVideoBtn}
-                onClick={async () => {
-                  await videosApi.add(selected)
-                  await loadVideos(selected)
-                  await loadMovements()
-                }}
-              >
-                + Add video
-              </button>
+              <div className={styles.panelActions}>
+                {videos.length >= 2 && (
+                  <button className={styles.compareBtn} onClick={() => setComparing(true)}>
+                    Compare
+                  </button>
+                )}
+                <button
+                  className={styles.addVideoBtn}
+                  onClick={async () => {
+                    await videosApi.add(selected)
+                    await loadVideos(selected)
+                    await loadMovements()
+                  }}
+                >
+                  + Add video
+                </button>
+              </div>
             </div>
 
-            {videos.length === 0 ? (
-              <div className={styles.emptyPanel}>
-                <p>No videos yet</p>
-              </div>
-            ) : (
-              <div className={styles.videoList}>
-                {videos.map((v) => (
-                  <VideoPlayer
-                    key={v.id}
-                    handle={v.fileHandle}
-                    createdAt={v.createdAt}
-                    onDelete={() => deleteVideo(v.id!)}
-                  />
-                ))}
-              </div>
-            )}
+            <div className={styles.panelContent}>
+              {videos.length === 0 ? (
+                <div className={styles.emptyPanel}>
+                  <p>No videos yet</p>
+                </div>
+              ) : (
+                <div className={styles.videoList}>
+                  {videos.map((v) => (
+                    <VideoPlayer
+                      key={v.id}
+                      handle={v.fileHandle}
+                      createdAt={v.createdAt}
+                      onDelete={() => deleteVideo(v.id!)}
+                      onClick={() => setOpenVideoId(v.id!)}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <ChecklistPanel movementId={selected} />
           </>
         )}
       </main>

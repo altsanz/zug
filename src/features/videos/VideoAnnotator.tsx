@@ -1,0 +1,89 @@
+import { useEffect, useRef, useState } from 'react'
+import { useVideoUrl } from '../../hooks/useVideoUrl'
+import { annotationsApi } from '../annotations/annotations.api'
+import { AnnotationTimeline } from '../annotations/AnnotationTimeline'
+import { AnnotationPanel } from '../annotations/AnnotationPanel'
+import type { Annotation, Video } from '../../db/db'
+import styles from './VideoAnnotator.module.css'
+
+interface Props {
+  video: Video
+  onBack: () => void
+  onDelete: () => void
+}
+
+export function VideoAnnotator({ video, onBack, onDelete }: Props) {
+  const { url } = useVideoUrl(video.fileHandle)
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const [currentTime, setCurrentTime] = useState(0)
+  const [duration, setDuration] = useState(0)
+  const [annotations, setAnnotations] = useState<Annotation[]>([])
+  const [confirming, setConfirming] = useState(false)
+
+  async function loadAnnotations() {
+    const list = await annotationsApi.getByVideo(video.id!)
+    setAnnotations(list)
+  }
+
+  useEffect(() => {
+    loadAnnotations()
+  }, [video.id])
+
+  function handleSeek(t: number) {
+    if (videoRef.current) {
+      videoRef.current.currentTime = t
+    }
+  }
+
+  const date = new Date(video.createdAt).toLocaleDateString(undefined, {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  })
+
+  return (
+    <div className={styles.annotator}>
+      <div className={styles.header}>
+        <button className={styles.backBtn} onClick={onBack}>← Back</button>
+        <span className={styles.filename}>{video.fileHandle.name}</span>
+        <span className={styles.date}>{date}</span>
+        {confirming ? (
+          <div className={styles.confirmDelete}>
+            <span className={styles.confirmLabel}>Delete?</span>
+            <button className={styles.confirmYes} onClick={onDelete}>Yes</button>
+            <button className={styles.confirmNo} onClick={() => setConfirming(false)}>Cancel</button>
+          </div>
+        ) : (
+          <button className={styles.deleteBtn} onClick={() => setConfirming(true)}>Delete</button>
+        )}
+      </div>
+
+      {url ? (
+        <video
+          ref={videoRef}
+          className={styles.video}
+          src={url}
+          controls
+          onTimeUpdate={() => setCurrentTime(videoRef.current?.currentTime ?? 0)}
+          onLoadedMetadata={() => setDuration(videoRef.current?.duration ?? 0)}
+        />
+      ) : (
+        <div className={styles.loading}>Loading…</div>
+      )}
+
+      <AnnotationTimeline
+        annotations={annotations}
+        duration={duration}
+        onSeek={handleSeek}
+      />
+
+      <AnnotationPanel
+        annotations={annotations}
+        currentTime={currentTime}
+        videoId={video.id!}
+        onSeek={handleSeek}
+        onMutate={loadAnnotations}
+      />
+    </div>
+  )
+}
