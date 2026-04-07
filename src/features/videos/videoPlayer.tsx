@@ -49,10 +49,7 @@ export function VideoPlayer({ handle, createdAt, onDelete, onDateChange, onClick
               defaultValue={tsToDateInput(createdAt)}
               autoFocus
               onClick={(e) => e.stopPropagation()}
-              onKeyDown={(e) => {
-                if (e.key === 'Escape') setEditingDate(false)
-                e.stopPropagation()
-              }}
+              
               onBlur={(e) => {
                 onDateChange?.(dateInputToTs(e.target.value))
                 setEditingDate(false)

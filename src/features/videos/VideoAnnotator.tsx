@@ -67,14 +67,11 @@ export function VideoAnnotator({ video, onBack, onDelete, onDateChange }: Props)
             className={styles.dateInput}
             defaultValue={tsToDateInput(video.createdAt)}
             autoFocus
-            onChange={(e) => {
-              if (e.target.value) {
-                onDateChange(dateInputToTs(e.target.value))
-                setEditingDate(false)
-              }
-            }}
             onKeyDown={(e) => { if (e.key === 'Escape') setEditingDate(false) }}
-            onBlur={() => setEditingDate(false)}
+            onBlur={(e) => {
+              if(e.target.value) onDateChange(dateInputToTs(e.target.value))
+              return setEditingDate(false)
+            }}
           />
         ) : (
           <span
