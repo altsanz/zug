@@ -3,7 +3,7 @@ import { annotationsApi } from './annotations.api'
 import type { Annotation } from '../../db/db'
 import styles from './AnnotationPanel.module.css'
 
-type AnnotationType = 'note' | 'issue' | 'improvement'
+type AnnotationType = 'note' | 'issue' | 'improvement' | 'idea'
 
 function formatTime(seconds: number): string {
   const m = Math.floor(seconds / 60)
@@ -106,6 +106,7 @@ export function AnnotationPanel({ annotations, currentTime, videoId, onSeek, onM
                   <option value="note">note</option>
                   <option value="issue">issue</option>
                   <option value="improvement">impr.</option>
+                  <option value="idea">idea</option>
                 </select>
                 <button className={styles.saveBtn} onClick={() => confirmEdit(a.id!)}>Save</button>
                 <button className={styles.cancelBtn} onClick={() => setEditingId(null)}>×</button>
@@ -142,6 +143,7 @@ export function AnnotationPanel({ annotations, currentTime, videoId, onSeek, onM
               <option value="note">note</option>
               <option value="issue">issue</option>
               <option value="improvement">impr.</option>
+              <option value="idea">idea</option>
             </select>
             <button className={styles.saveBtn} onClick={confirmAdd}>Add</button>
             <button className={styles.cancelBtn} onClick={() => { setAdding(false); setAddText('') }}>×</button>

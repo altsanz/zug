@@ -14,7 +14,14 @@ export function MovementPanel() {
 
   const { data: movement } = useLiveQuery(() => db.movements.get(mid), [mid])
   const { data: videos = [] } = useLiveQuery(() => videosApi.getByMovement(mid), [mid])
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>(
+    () => (localStorage.getItem('videoViewMode') as 'grid' | 'list') ?? 'grid'
+  )
+
+  function changeViewMode(mode: 'grid' | 'list') {
+    localStorage.setItem('videoViewMode', mode)
+    setViewMode(mode)
+  }
 
   return (
     <>
@@ -24,11 +31,11 @@ export function MovementPanel() {
           <div className={styles.viewToggle}>
             <button
               className={`${styles.viewBtn} ${viewMode === 'grid' ? styles.viewBtnActive : ''}`}
-              onClick={() => setViewMode('grid')}
+              onClick={() => changeViewMode('grid')}
             >Grid</button>
             <button
               className={`${styles.viewBtn} ${viewMode === 'list' ? styles.viewBtnActive : ''}`}
-              onClick={() => setViewMode('list')}
+              onClick={() => changeViewMode('list')}
             >List</button>
           </div>
           {videos.length >= 2 && (

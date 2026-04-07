@@ -24,9 +24,10 @@ interface Props {
   onBack: () => void
   onDelete: () => void
   onDateChange: (ts: number) => void
+  initialTime?: number
 }
 
-export function VideoAnnotator({ video, onBack, onDelete, onDateChange }: Props) {
+export function VideoAnnotator({ video, onBack, onDelete, onDateChange, initialTime }: Props) {
   const { url } = useVideoUrl(video.fileHandle)
   const videoRef = useRef<HTMLVideoElement>(null)
   const [currentTime, setCurrentTime] = useState(0)
@@ -100,7 +101,12 @@ export function VideoAnnotator({ video, onBack, onDelete, onDateChange }: Props)
           src={url}
           controls
           onTimeUpdate={() => setCurrentTime(videoRef.current?.currentTime ?? 0)}
-          onLoadedMetadata={() => setDuration(videoRef.current?.duration ?? 0)}
+          onLoadedMetadata={() => {
+              setDuration(videoRef.current?.duration ?? 0)
+              if (initialTime !== undefined && videoRef.current) {
+                videoRef.current.currentTime = initialTime
+              }
+            }}
         />
       ) : (
         <div className={styles.loading}>Loading…</div>

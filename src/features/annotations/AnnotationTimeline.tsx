@@ -5,6 +5,7 @@ const TYPE_COLOR: Record<Annotation['type'], string> = {
   note: 'var(--accent)',
   issue: '#ff5f5f',
   improvement: '#4dffb4',
+  idea: '#c084fc',
 }
 
 function formatTime(seconds: number): string {

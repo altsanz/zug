@@ -19,6 +19,33 @@
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--accent);
+  text-decoration: none;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: 24px;
+}
+
+.navLink {
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--text-muted);
+  text-decoration: none;
+  padding: 5px 10px;
+  border-radius: var(--radius);
+  transition: color 0.1s, background 0.1s;
+}
+
+.navLink:hover {
+  color: var(--text);
+}
+
+.navLinkActive {
+  color: var(--text);
+  background: var(--surface);
 }
 
 .emptyPanel {

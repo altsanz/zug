@@ -18,7 +18,7 @@ export interface Annotation {
   videoId: number
   timestamp: number
   text: string
-  type: 'note' | 'issue' | 'improvement'
+  type: 'note' | 'issue' | 'improvement' | 'idea'
 }
 
 export interface ChecklistItem {
@@ -50,6 +50,7 @@ class AppDB extends Dexie {
       annotations: '++id, videoId, timestamp',
       checklists: '++id, movementId, done'
     })
+    
   }
 }
 

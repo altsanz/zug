@@ -122,6 +122,11 @@
   color: #4dffb4;
 }
 
+.idea {
+  background: rgba(192, 132, 252, 0.12);
+  color: #c084fc;
+}
+
 .deleteBtn {
   flex-shrink: 0;
   background: none;

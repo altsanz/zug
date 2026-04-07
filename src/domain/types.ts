@@ -16,12 +16,14 @@ export interface Video {
   createdAt: number
 }
 
+export type AnnotationType = 'note' | 'issue' | 'improvement' | 'idea'
+
 export interface Annotation {
   id: AnnotationId
   videoId: VideoId
   timestamp: number
   text: string
-  type: 'note' | 'issue' | 'improvement'
+  type: AnnotationType 
 }
 
 export interface Session {
