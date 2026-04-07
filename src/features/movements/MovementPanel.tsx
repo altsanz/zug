@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useLiveQuery } from '../../hooks/useLiveQuery'
 import { videosApi } from '../videos/videos.api'
@@ -13,12 +14,23 @@ export function MovementPanel() {
 
   const { data: movement } = useLiveQuery(() => db.movements.get(mid), [mid])
   const { data: videos = [] } = useLiveQuery(() => videosApi.getByMovement(mid), [mid])
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
 
   return (
     <>
       <div className={styles.panelHeader}>
         <span className={styles.panelTitle}>{movement?.name}</span>
         <div className={styles.panelActions}>
+          <div className={styles.viewToggle}>
+            <button
+              className={`${styles.viewBtn} ${viewMode === 'grid' ? styles.viewBtnActive : ''}`}
+              onClick={() => setViewMode('grid')}
+            >Grid</button>
+            <button
+              className={`${styles.viewBtn} ${viewMode === 'list' ? styles.viewBtnActive : ''}`}
+              onClick={() => setViewMode('list')}
+            >List</button>
+          </div>
           {videos.length >= 2 && (
             <button
               className={styles.compareBtn}
@@ -42,7 +54,7 @@ export function MovementPanel() {
             <p>No videos yet</p>
           </div>
         ) : (
-          <div className={styles.videoList}>
+          <div className={viewMode === 'list' ? styles.videoListRows : styles.videoList}>
             {videos.map((v) => (
               <VideoPlayer
                 key={v.id}
@@ -51,6 +63,7 @@ export function MovementPanel() {
                 onDelete={() => videosApi.remove(v.id!)}
                 onDateChange={(ts) => videosApi.updateDate(v.id!, ts)}
                 onClick={() => navigate(`/movements/${movementId}/videos/${v.id}`)}
+                listMode={viewMode === 'list'}
               />
             ))}
           </div>

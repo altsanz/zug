@@ -18,6 +18,29 @@
   gap: 8px;
 }
 
+.viewToggle {
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.viewBtn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-family: inherit;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s;
+}
+
+.viewBtnActive {
+  background: var(--surface);
+  color: var(--text);
+}
+
 .compareBtn {
   background: none;
   border: 1px solid var(--border);
@@ -74,4 +97,15 @@
   flex-direction: column;
   gap: 20px;
   max-width: 700px;
+}
+
+.videoListRows {
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  max-width: 700px;
+  margin: 20px 24px;
 }

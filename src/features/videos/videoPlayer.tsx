@@ -21,10 +21,11 @@ interface Props {
   onDelete: () => void
   onDateChange?: (ts: number) => void
   onClick?: () => void
+  listMode?: boolean
 }
 
-export function VideoPlayer({ handle, createdAt, onDelete, onDateChange, onClick }: Props) {
-  const { url } = useVideoUrl(handle)
+export function VideoPlayer({ handle, createdAt, onDelete, onDateChange, onClick, listMode = false }: Props) {
+  const { url } = useVideoUrl(handle, !listMode)
   const [confirming, setConfirming] = useState(false)
   const [editingDate, setEditingDate] = useState(false)
 
@@ -35,7 +36,7 @@ export function VideoPlayer({ handle, createdAt, onDelete, onDateChange, onClick
   })
 
   return (
-    <div className={styles.card}>
+    <div className={`${styles.card} ${listMode ? styles.cardList : ''}`}>
       <div
         className={`${styles.meta} ${onClick ? styles.metaClickable : ''}`}
         onClick={confirming || editingDate ? undefined : onClick}
@@ -77,11 +78,11 @@ export function VideoPlayer({ handle, createdAt, onDelete, onDateChange, onClick
           )}
         </div>
       </div>
-      {url ? (
+      {!listMode && (url ? (
         <video className={styles.video} src={url} controls />
       ) : (
         <div className={styles.loading}>Loading…</div>
-      )}
+      ))}
     </div>
   )
 }
