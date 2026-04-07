@@ -6,19 +6,34 @@ import { AnnotationPanel } from '../annotations/AnnotationPanel'
 import type { Annotation, Video } from '../../db/db'
 import styles from './VideoAnnotator.module.css'
 
+function tsToDateInput(ts: number): string {
+  const d = new Date(ts)
+  const y = d.getFullYear()
+  const m = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${y}-${m}-${day}`
+}
+
+function dateInputToTs(val: string): number {
+  const [y, mo, d] = val.split('-').map(Number)
+  return new Date(y, mo - 1, d).getTime()
+}
+
 interface Props {
   video: Video
   onBack: () => void
   onDelete: () => void
+  onDateChange: (ts: number) => void
 }
 
-export function VideoAnnotator({ video, onBack, onDelete }: Props) {
+export function VideoAnnotator({ video, onBack, onDelete, onDateChange }: Props) {
   const { url } = useVideoUrl(video.fileHandle)
   const videoRef = useRef<HTMLVideoElement>(null)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
   const [annotations, setAnnotations] = useState<Annotation[]>([])
   const [confirming, setConfirming] = useState(false)
+  const [editingDate, setEditingDate] = useState(false)
 
   async function loadAnnotations() {
     const list = await annotationsApi.getByVideo(video.id!)
@@ -35,7 +50,7 @@ export function VideoAnnotator({ video, onBack, onDelete }: Props) {
     }
   }
 
-  const date = new Date(video.createdAt).toLocaleDateString(undefined, {
+  const formattedDate = new Date(video.createdAt).toLocaleDateString(undefined, {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
@@ -46,7 +61,30 @@ export function VideoAnnotator({ video, onBack, onDelete }: Props) {
       <div className={styles.header}>
         <button className={styles.backBtn} onClick={onBack}>← Back</button>
         <span className={styles.filename}>{video.fileHandle.name}</span>
-        <span className={styles.date}>{date}</span>
+        {editingDate ? (
+          <input
+            type="date"
+            className={styles.dateInput}
+            defaultValue={tsToDateInput(video.createdAt)}
+            autoFocus
+            onChange={(e) => {
+              if (e.target.value) {
+                onDateChange(dateInputToTs(e.target.value))
+                setEditingDate(false)
+              }
+            }}
+            onKeyDown={(e) => { if (e.key === 'Escape') setEditingDate(false) }}
+            onBlur={() => setEditingDate(false)}
+          />
+        ) : (
+          <span
+            className={styles.date}
+            onClick={() => setEditingDate(true)}
+            title="Click to edit date"
+          >
+            {formattedDate}
+          </span>
+        )}
         {confirming ? (
           <div className={styles.confirmDelete}>
             <span className={styles.confirmLabel}>Delete?</span>

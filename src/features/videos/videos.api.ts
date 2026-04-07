@@ -34,5 +34,8 @@ export const videosApi = {
     )
   },
 
+  updateDate: (id: number, createdAt: number) =>
+    db.videos.update(id, { createdAt }),
+
   remove: (id: number) => db.videos.delete(id),
 }

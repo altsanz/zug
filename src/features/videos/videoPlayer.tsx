@@ -2,18 +2,33 @@ import { useState } from 'react'
 import { useVideoUrl } from '../../hooks/useVideoUrl'
 import styles from './videoPlayer.module.css'
 
+function tsToDateInput(ts: number): string {
+  const d = new Date(ts)
+  const y = d.getFullYear()
+  const m = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${y}-${m}-${day}`
+}
+
+function dateInputToTs(val: string): number {
+  const [y, mo, d] = val.split('-').map(Number)
+  return new Date(y, mo - 1, d).getTime()
+}
+
 interface Props {
   handle: FileSystemFileHandle
   createdAt: number
   onDelete: () => void
+  onDateChange?: (ts: number) => void
   onClick?: () => void
 }
 
-export function VideoPlayer({ handle, createdAt, onDelete, onClick }: Props) {
+export function VideoPlayer({ handle, createdAt, onDelete, onDateChange, onClick }: Props) {
   const { url } = useVideoUrl(handle)
   const [confirming, setConfirming] = useState(false)
+  const [editingDate, setEditingDate] = useState(false)
 
-  const date = new Date(createdAt).toLocaleDateString(undefined, {
+  const formattedDate = new Date(createdAt).toLocaleDateString(undefined, {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
@@ -23,11 +38,34 @@ export function VideoPlayer({ handle, createdAt, onDelete, onClick }: Props) {
     <div className={styles.card}>
       <div
         className={`${styles.meta} ${onClick ? styles.metaClickable : ''}`}
-        onClick={confirming ? undefined : onClick}
+        onClick={confirming || editingDate ? undefined : onClick}
       >
         <span className={styles.filename}>{handle.name}</span>
         <div className={styles.group}>
-          <span className={styles.date}>{date}</span>
+          {editingDate ? (
+            <input
+              type="date"
+              className={styles.dateInput}
+              defaultValue={tsToDateInput(createdAt)}
+              autoFocus
+              onClick={(e) => e.stopPropagation()}
+              onKeyDown={(e) => {
+                if (e.key === 'Escape') setEditingDate(false)
+                e.stopPropagation()
+              }}
+              onBlur={(e) => {
+                onDateChange?.(dateInputToTs(e.target.value))
+                setEditingDate(false)
+            }}
+            />
+          ) : (
+            <span
+              className={`${styles.date} ${onDateChange ? styles.dateEditable : ''}`}
+              onClick={(e) => { e.stopPropagation(); if (onDateChange) setEditingDate(true) }}
+            >
+              {formattedDate}
+            </span>
+          )}
           {confirming ? (
             <div className={styles.confirmDelete} onClick={(e) => e.stopPropagation()}>
               <span className={styles.confirmLabel}>Remove?</span>
