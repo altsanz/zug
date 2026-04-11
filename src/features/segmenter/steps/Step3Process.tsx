@@ -1,6 +1,5 @@
 import { useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { fetchFile } from '@ffmpeg/util'
 import type { SegmentDraft } from '../segmenter.types'
 import { loadFFmpeg } from '../ffmpeg'
 import { saveSegments } from '../segmenter.api'
@@ -88,8 +87,11 @@ export function Step3Process({ segments, sourceFile, onBack }: Props) {
 
     const logHandler = ({ message }: { message: string }) => setLog(message)
 
-    setLog('Writing source file to ffmpeg…')
-    await ffmpegRef.current.writeFile('input.mp4', await fetchFile(sourceFile))
+    setLog('Mounting source file…')
+    const MOUNT = '/workerfs'
+    await ffmpegRef.current.createDir(MOUNT)
+    await ffmpegRef.current.mount('WORKERFS' as any, { files: [sourceFile] }, MOUNT)
+    const inputPath = `${MOUNT}/${sourceFile.name}`
 
     const fileHandles: (FileSystemFileHandle | null)[] = Array(segments.length).fill(null)
 
@@ -108,7 +110,7 @@ export function Step3Process({ segments, sourceFile, onBack }: Props) {
 
       try {
         await ffmpegRef.current.exec([
-          '-i', 'input.mp4',
+          '-i', inputPath,
           '-ss', ffmpegTime(seg.startTime),
           '-to', ffmpegTime(seg.endTime),
           '-c', 'copy',
@@ -134,7 +136,8 @@ export function Step3Process({ segments, sourceFile, onBack }: Props) {
     }
 
     ffmpegRef.current.off('log', logHandler)
-    try { await ffmpegRef.current.deleteFile('input.mp4') } catch { /* ignore */ }
+    try { await ffmpegRef.current.unmount(MOUNT) } catch { /* ignore */ }
+    try { await ffmpegRef.current.deleteDir(MOUNT) } catch { /* ignore */ }
 
     // Save successful segments to DB
     const successes = segments
