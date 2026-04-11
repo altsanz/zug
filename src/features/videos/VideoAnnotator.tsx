@@ -23,11 +23,12 @@ interface Props {
   video: Video
   onBack: () => void
   onDelete: () => void
+  onCompare: () => void
   onDateChange: (ts: number) => void
   initialTime?: number
 }
 
-export function VideoAnnotator({ video, onBack, onDelete, onDateChange, initialTime }: Props) {
+export function VideoAnnotator({ video, onBack, onDelete, onCompare, onDateChange, initialTime }: Props) {
   const { url } = useVideoUrl(video.fileHandle)
   const videoRef = useRef<HTMLVideoElement>(null)
   const [currentTime, setCurrentTime] = useState(0)
@@ -104,7 +105,10 @@ export function VideoAnnotator({ video, onBack, onDelete, onDateChange, initialT
             <button className={styles.confirmNo} onClick={() => setConfirming(false)}>Cancel</button>
           </div>
         ) : (
-          <button className={styles.deleteBtn} onClick={() => setConfirming(true)}>Delete</button>
+          <>
+            <button className={styles.compareBtn} onClick={onCompare}>Compare</button>
+            <button className={styles.deleteBtn} onClick={() => setConfirming(true)}>Delete</button>
+          </>
         )}
       </div>
 

@@ -25,6 +25,7 @@ export function VideoAnnotatorRoute() {
         await videosApi.remove(video.id!)
         navigate(`/movements/${movementId}`)
       }}
+      onCompare={() => navigate(`/movements/${movementId}/compare?left=${video.id}`)}
       onDateChange={(ts) => videosApi.updateDate(video.id!, ts)}
       initialTime={initialTime}
     />

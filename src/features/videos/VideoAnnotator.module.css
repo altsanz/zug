@@ -64,6 +64,24 @@
   color-scheme: dark;
 }
 
+.compareBtn {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-muted);
+  font-size: 12px;
+  font-family: inherit;
+  padding: 4px 10px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: border-color 0.1s, color 0.1s;
+}
+
+.compareBtn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
 .deleteBtn {
   background: none;
   border: 1px solid var(--border);

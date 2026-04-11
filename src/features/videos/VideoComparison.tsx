@@ -5,12 +5,13 @@ import styles from './VideoComparison.module.css'
 
 interface Props {
   videos: Video[]
+  initialLeftId?: number
   onBack: () => void
 }
 
-export function VideoComparison({ videos, onBack }: Props) {
-  const [leftId, setLeftId] = useState<number>(videos[0]?.id ?? 0)
-  const [rightId, setRightId] = useState<number>(videos[1]?.id ?? 0)
+export function VideoComparison({ videos, initialLeftId, onBack }: Props) {
+  const [leftId, setLeftId] = useState<number>(() => initialLeftId ?? videos[0]?.id ?? 0)
+  const [rightId, setRightId] = useState<number>(() => initialLeftId != null ? 0 : (videos[1]?.id ?? 0))
   const [synced, setSynced] = useState(false)
 
   const leftRef = useRef<HTMLVideoElement>(null)
@@ -80,6 +81,7 @@ export function VideoComparison({ videos, onBack }: Props) {
             value={rightId}
             onChange={(e) => setRightId(Number(e.target.value))}
           >
+            {rightId === 0 && <option value={0} disabled>Pick a video…</option>}
             {videos.map((v) => (
               <option key={v.id} value={v.id}>{v.fileHandle?.name ?? v.fileName ?? 'Unknown file'}</option>
             ))}
@@ -98,8 +100,10 @@ export function VideoComparison({ videos, onBack }: Props) {
           <VideoComparisonPlayer ref={leftRef} handle={leftVideo.fileHandle} fileName={leftVideo.fileName} />
         )}
         <div className={styles.divider} />
-        {rightVideo && (
+        {rightVideo ? (
           <VideoComparisonPlayer ref={rightRef} handle={rightVideo.fileHandle} fileName={rightVideo.fileName} />
+        ) : (
+          <div className={styles.pickPrompt}>Pick a video to compare</div>
         )}
       </div>
     </div>
