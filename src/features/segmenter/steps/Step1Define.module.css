@@ -26,6 +26,12 @@
   gap: 12px;
 }
 
+.dropHint {
+  font-size: 13px;
+  color: var(--accent);
+  pointer-events: none;
+}
+
 .pickBtn {
   background: var(--accent);
   border: none;

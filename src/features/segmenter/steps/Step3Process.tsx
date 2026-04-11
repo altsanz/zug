@@ -63,6 +63,12 @@ export function Step3Process({ segments, sourceFile, onBack }: Props) {
       return // user cancelled
     }
 
+    // Collect names already on disk so we can avoid collisions
+    const claimedNames = new Set<string>()
+    for await (const [name] of (dirHandle as any).entries() as AsyncIterable<[string, unknown]>) {
+      claimedNames.add(name)
+    }
+
     setRunning(true)
     const local: SegResult[] = segments.map((s) => ({ segId: s.id, status: 'pending' as Status }))
     setResults([...local])
@@ -92,7 +98,13 @@ export function Step3Process({ segments, sourceFile, onBack }: Props) {
       local[i] = { ...local[i], status: 'processing' }
       setResults([...local])
 
-      const outName = outputFilename(dateStr, i, seg.name)
+      let nameIdx = i
+      let outName = outputFilename(dateStr, nameIdx, seg.name)
+      while (claimedNames.has(outName)) {
+        nameIdx++
+        outName = outputFilename(dateStr, nameIdx, seg.name)
+      }
+      claimedNames.add(outName)
 
       try {
         await ffmpegRef.current.exec([

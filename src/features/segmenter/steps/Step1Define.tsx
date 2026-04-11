@@ -16,10 +16,11 @@ interface Props {
   onSegmentsChange: (s: SegmentDraft[]) => void
   videoUrl: string | null
   onPickFile: () => void
+  onDropFile: (file: File) => void
   onNext: () => void
 }
 
-export function Step1Define({ segments, onSegmentsChange, videoUrl, onPickFile, onNext }: Props) {
+export function Step1Define({ segments, onSegmentsChange, videoUrl, onPickFile, onDropFile, onNext }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const [currentTime, setCurrentTime] = useState(0)
   const [markStart, setMarkStart] = useState<number | null>(null)
@@ -27,6 +28,7 @@ export function Step1Define({ segments, onSegmentsChange, videoUrl, onPickFile, 
   const [name, setName] = useState('')
   const [movementId, setMovementId] = useState<number | ''>('')
   const [movements, setMovements] = useState<Movement[]>([])
+  const [dragging, setDragging] = useState(false)
 
   useEffect(() => {
     db.movements.toArray().then(setMovements)
@@ -67,12 +69,23 @@ export function Step1Define({ segments, onSegmentsChange, videoUrl, onPickFile, 
 
   return (
     <div className={styles.container}>
-      <div className={styles.videoArea}>
+      <div
+        className={`${styles.videoArea} ${!videoUrl && dragging ? styles.dragOver : ''}`}
+        onDragOver={!videoUrl ? (e) => { e.preventDefault(); setDragging(true) } : undefined}
+        onDragLeave={!videoUrl ? () => setDragging(false) : undefined}
+        onDrop={!videoUrl ? (e) => {
+          e.preventDefault()
+          setDragging(false)
+          const file = e.dataTransfer.files[0]
+          if (file && file.type.startsWith('video/')) onDropFile(file)
+        } : undefined}
+      >
         {!videoUrl ? (
           <div className={styles.placeholder}>
             <button className={styles.pickBtn} onClick={onPickFile}>
               Select video file
             </button>
+            {dragging && <span className={styles.dropHint}>Drop to load</span>}
           </div>
         ) : (
           <video
