@@ -47,6 +47,11 @@ export function SegmenterPage() {
           onSegmentsChange={setSegments}
           videoUrl={videoUrl}
           onPickFile={pickFile}
+          onDropFile={(file) => {
+            if (videoUrl) URL.revokeObjectURL(videoUrl)
+            setSourceFile(file)
+            setVideoUrl(URL.createObjectURL(file))
+          }}
           onNext={() => setStep(2)}
         />
       )}

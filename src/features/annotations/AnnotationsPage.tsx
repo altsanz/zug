@@ -47,7 +47,9 @@ export function AnnotationsPage() {
     .sort((a, b) => {
       const mc = a.movement.name.localeCompare(b.movement.name)
       if (mc !== 0) return mc
-      const vc = a.video.fileHandle.name.localeCompare(b.video.fileHandle.name)
+      const aName = a.video.fileHandle?.name ?? a.video.fileName ?? ''
+      const bName = b.video.fileHandle?.name ?? b.video.fileName ?? ''
+      const vc = aName.localeCompare(bName)
       if (vc !== 0) return vc
       return a.annotation.timestamp - b.annotation.timestamp
     })
@@ -113,7 +115,7 @@ export function AnnotationsPage() {
               <div className={styles.context}>
                 <span className={styles.movementName}>{movement.name}</span>
                 <span className={styles.separator}>›</span>
-                <span className={styles.videoName}>{video.fileHandle.name}</span>
+                <span className={styles.videoName}>{video.fileHandle?.name ?? video.fileName ?? 'Unknown file'}</span>
               </div>
               <button
                 className={styles.timestamp}

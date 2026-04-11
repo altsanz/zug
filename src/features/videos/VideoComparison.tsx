@@ -71,7 +71,7 @@ export function VideoComparison({ videos, onBack }: Props) {
             onChange={(e) => setLeftId(Number(e.target.value))}
           >
             {videos.map((v) => (
-              <option key={v.id} value={v.id}>{v.fileHandle.name}</option>
+              <option key={v.id} value={v.id}>{v.fileHandle?.name ?? v.fileName ?? 'Unknown file'}</option>
             ))}
           </select>
           <span className={styles.vs}>vs</span>
@@ -81,7 +81,7 @@ export function VideoComparison({ videos, onBack }: Props) {
             onChange={(e) => setRightId(Number(e.target.value))}
           >
             {videos.map((v) => (
-              <option key={v.id} value={v.id}>{v.fileHandle.name}</option>
+              <option key={v.id} value={v.id}>{v.fileHandle?.name ?? v.fileName ?? 'Unknown file'}</option>
             ))}
           </select>
         </div>
@@ -95,11 +95,11 @@ export function VideoComparison({ videos, onBack }: Props) {
 
       <div className={styles.players}>
         {leftVideo && (
-          <VideoComparisonPlayer ref={leftRef} handle={leftVideo.fileHandle} />
+          <VideoComparisonPlayer ref={leftRef} handle={leftVideo.fileHandle} fileName={leftVideo.fileName} />
         )}
         <div className={styles.divider} />
         {rightVideo && (
-          <VideoComparisonPlayer ref={rightRef} handle={rightVideo.fileHandle} />
+          <VideoComparisonPlayer ref={rightRef} handle={rightVideo.fileHandle} fileName={rightVideo.fileName} />
         )}
       </div>
     </div>

@@ -1,3 +1,4 @@
+import { useRef } from 'react'
 import { createBrowserRouter, Link, Outlet, RouterProvider, useLocation } from 'react-router-dom'
 import { MovementsLayout } from './features/movements/MovementsLayout'
 import { MovementPanel } from './features/movements/MovementPanel'
@@ -5,12 +6,26 @@ import { VideoAnnotatorRoute } from './features/videos/VideoAnnotatorRoute'
 import { VideoComparisonRoute } from './features/videos/VideoComparisonRoute'
 import { AnnotationsPage } from './features/annotations/AnnotationsPage'
 import { SegmenterPage } from './features/segmenter/SegmenterPage'
+import { exportDatabase, importDatabase, relinkVideosFromFolder } from './features/db/dbIO'
 import styles from './app.module.css'
 
 function RootLayout() {
   const location = useLocation()
   const onAnnotations = location.pathname.startsWith('/annotations')
   const onSegment = location.pathname.startsWith('/segment')
+  const importRef = useRef<HTMLInputElement>(null)
+
+  async function handleImport(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    e.target.value = ''
+    if (!confirm('This will replace all existing data. Continue?')) return
+    try {
+      await importDatabase(file)
+    } catch (err) {
+      alert(`Import failed: ${err instanceof Error ? err.message : String(err)}`)
+    }
+  }
 
   return (
     <div className={styles.shell}>
@@ -27,6 +42,15 @@ function RootLayout() {
             Segment
           </Link>
         </nav>
+        <div className={styles.dbActions}>
+          <button className={styles.dbBtn} onClick={exportDatabase}>Export</button>
+          <button className={styles.dbBtn} onClick={() => importRef.current?.click()}>Import</button>
+          <button className={styles.dbBtn} onClick={async () => {
+            try { await relinkVideosFromFolder() }
+            catch (err) { alert(`Relink failed: ${err instanceof Error ? err.message : String(err)}`) }
+          }}>Relink</button>
+          <input ref={importRef} type="file" accept=".json" style={{ display: 'none' }} onChange={handleImport} />
+        </div>
       </header>
       <Outlet />
     </div>

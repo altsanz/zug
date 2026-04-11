@@ -45,6 +45,20 @@ export function VideoAnnotator({ video, onBack, onDelete, onDateChange, initialT
     loadAnnotations()
   }, [video.id])
 
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      const tag = (e.target as HTMLElement).tagName
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return
+      const video = videoRef.current
+      if (!video) return
+      const FRAME = 1 / 30
+      if (e.key === '.') { e.preventDefault(); video.currentTime += FRAME }
+      if (e.key === ',') { e.preventDefault(); video.currentTime -= FRAME }
+    }
+    document.addEventListener('keydown', onKeyDown)
+    return () => document.removeEventListener('keydown', onKeyDown)
+  }, [])
+
   function handleSeek(t: number) {
     if (videoRef.current) {
       videoRef.current.currentTime = t
@@ -61,7 +75,7 @@ export function VideoAnnotator({ video, onBack, onDelete, onDateChange, initialT
     <div className={styles.annotator}>
       <div className={styles.header}>
         <button className={styles.backBtn} onClick={onBack}>← Back</button>
-        <span className={styles.filename}>{video.fileHandle.name}</span>
+        <span className={styles.filename}>{video.fileHandle?.name ?? video.fileName ?? 'Unknown file'}</span>
         {editingDate ? (
           <input
             type="date"
@@ -94,7 +108,9 @@ export function VideoAnnotator({ video, onBack, onDelete, onDateChange, initialT
         )}
       </div>
 
-      {url ? (
+      {!video.fileHandle ? (
+        <div className={styles.loading}>File not linked — re-add this video to restore playback</div>
+      ) : url ? (
         <video
           ref={videoRef}
           className={styles.video}

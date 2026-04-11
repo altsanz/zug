@@ -48,6 +48,30 @@
   background: var(--surface);
 }
 
+.dbActions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.dbBtn {
+  font-size: 12px;
+  font-family: inherit;
+  color: var(--text-muted);
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: color 0.1s, border-color 0.1s;
+}
+
+.dbBtn:hover {
+  color: var(--text);
+  border-color: var(--text-muted);
+}
+
 .emptyPanel {
   flex: 1;
   display: flex;

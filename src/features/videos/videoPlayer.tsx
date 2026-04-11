@@ -16,7 +16,8 @@ function dateInputToTs(val: string): number {
 }
 
 interface Props {
-  handle: FileSystemFileHandle
+  handle?: FileSystemFileHandle
+  fileName?: string
   createdAt: number
   onDelete: () => void
   onDateChange?: (ts: number) => void
@@ -24,8 +25,9 @@ interface Props {
   listMode?: boolean
 }
 
-export function VideoPlayer({ handle, createdAt, onDelete, onDateChange, onClick, listMode = false }: Props) {
+export function VideoPlayer({ handle, fileName, createdAt, onDelete, onDateChange, onClick, listMode = false }: Props) {
   const { url } = useVideoUrl(handle, !listMode)
+  const displayName = handle?.name ?? fileName ?? 'Unknown file'
   const [confirming, setConfirming] = useState(false)
   const [editingDate, setEditingDate] = useState(false)
 
@@ -41,7 +43,7 @@ export function VideoPlayer({ handle, createdAt, onDelete, onDateChange, onClick
         className={`${styles.meta} ${onClick ? styles.metaClickable : ''}`}
         onClick={confirming || editingDate ? undefined : onClick}
       >
-        <span className={styles.filename}>{handle.name}</span>
+        <span className={styles.filename}>{displayName}</span>
         <div className={styles.group}>
           {editingDate ? (
             <input
@@ -78,7 +80,9 @@ export function VideoPlayer({ handle, createdAt, onDelete, onDateChange, onClick
           )}
         </div>
       </div>
-      {!listMode && (url ? (
+      {!listMode && (!handle ? (
+        <div className={styles.loading}>File not linked — re-add to restore</div>
+      ) : url ? (
         <video className={styles.video} src={url} controls />
       ) : (
         <div className={styles.loading}>Loading…</div>

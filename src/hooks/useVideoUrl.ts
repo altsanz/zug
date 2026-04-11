@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react'
 import { ensurePermission, getVideoURL } from '../lib/fileSystem'
 
-export function useVideoUrl(handle: FileSystemFileHandle, enabled = true) {
+export function useVideoUrl(handle: FileSystemFileHandle | undefined, enabled = true) {
   const [url, setUrl] = useState<string>()
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (!enabled) {
+    if (!enabled || !handle) {
       setUrl(undefined)
       setLoading(false)
       return
@@ -14,8 +14,8 @@ export function useVideoUrl(handle: FileSystemFileHandle, enabled = true) {
     let cancelled = false
     async function load() {
       setLoading(true)
-      await ensurePermission(handle)
-      const u = await getVideoURL(handle)
+      await ensurePermission(handle!)
+      const u = await getVideoURL(handle!)
       if (!cancelled) {
         setUrl(u)
         setLoading(false)

@@ -9,7 +9,8 @@ export interface Movement {
 export interface Video {
   id?: number
   movementId: number
-  fileHandle: FileSystemFileHandle
+  fileHandle?: FileSystemFileHandle
+  fileName?: string
   createdAt: number
 }
 

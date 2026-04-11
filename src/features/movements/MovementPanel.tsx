@@ -66,6 +66,7 @@ export function MovementPanel() {
               <VideoPlayer
                 key={v.id}
                 handle={v.fileHandle}
+                fileName={v.fileName}
                 createdAt={v.createdAt}
                 onDelete={() => videosApi.remove(v.id!)}
                 onDateChange={(ts) => videosApi.updateDate(v.id!, ts)}

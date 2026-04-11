@@ -14,7 +14,7 @@ export const videosApi = {
     const newHandles = await Promise.all(
       picked.map(async (handle) => {
         for (const v of existing) {
-          if (await handle.isSameEntry(v.fileHandle)) return null
+          if (v.fileHandle && await handle.isSameEntry(v.fileHandle)) return null
         }
         return handle
       })
